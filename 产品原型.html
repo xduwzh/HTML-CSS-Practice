@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>应用系统文件管理系统</title>
+    <style>
+      :root {
+        --primary: #6d8aff;
+        --primary-light: #8fa3ff;
+        --primary-dark: #4d6bd1;
+        --secondary: #7a7f8c;
+        --light: #f9fafc;
+        --lighter: #f6f8fb;
+        --dark: #2d3748;
+        --success: #48bb78;
+        --warning: #ed8936;
+        --danger: #f56565;
+        --shadow: rgba(0, 0, 0, 0.03);
+        --border: rgba(0, 0, 0, 0.06);
+        --card-bg: #ffffff;
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+        --gap: 1rem;
+        --radius: 8px;
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      }
+
+      body {
+        background-color: var(--lighter);
+        color: var(--text-primary);
+        line-height: 1.6;
+        padding-bottom: 3rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Header */
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .logo-icon {
+        background: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .logo-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      .tagline {
+        font-size: 1rem;
+        opacity: 0.85;
+        font-weight: 300;
+        margin-top: 0.5rem;
+      }
+
+      nav ul {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      nav a {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        position: relative;
+        padding: 0.5rem 0;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: white;
+      }
+
+      nav a::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: white;
+        transition: var(--transition);
+      }
+
+      nav a:hover::after,
+      nav a.active::after {
+        width: 100%;
+      }
+
+      /* Card Style */
+      .card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+        padding: 1.8rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+      }
+
+      .card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+      }
+
+      .card-icon {
+        background: var(--lighter);
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      /* Main Dashboard */
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* File Upload */
+      .upload-area {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 3rem 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        position: relative;
+        transition: var(--transition);
+        background-color: rgba(109, 138, 255, 0.02);
+      }
+
+      .upload-area:hover {
+        border-color: var(--primary-light);
+        background: rgba(122, 155, 254, 0.03);
+      }
+
+      .upload-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+      }
+
+      .upload-info {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+      }
+
+      .upload-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.75rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .upload-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .file-list {
+        list-style: none;
+      }
+
+      .file-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        background: var(--lighter);
+      }
+
+      .file-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+      }
+
+      .file-info {
+        flex: 1;
+      }
+
+      .file-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .file-meta {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      .file-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .status-encrypted {
+        background: rgba(92, 184, 92, 0.15);
+        color: #2b8a3e;
+      }
+
+      .status-processing {
+        background: rgba(240, 173, 78, 0.15);
+        color: #d9480f;
+      }
+
+      /* Knowledge Graphs */
+      .model-form {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(90, 155, 254, 0.15);
+      }
+
+      .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .action-bar {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        padding: 0.85rem 1.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 1px 2px rgba(109, 138, 255, 0.2);
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+      }
+
+      .btn-outline:hover {
+        background: rgba(90, 155, 254, 0.1);
+      }
+
+      /* Process Indicators */
+      .process-steps {
+        display: flex;
+        margin-bottom: 2rem;
+      }
+
+      .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        padding: 0 0.5rem;
+      }
+
+      .step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 16px;
+        right: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--border);
+        z-index: 1;
+      }
+
+      .step-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--border);
+        margin: 0 auto 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .step.active .step-icon {
+        background: var(--primary);
+        color: white;
+      }
+
+      .step.active .step-label {
+        color: var(--primary);
+        font-weight: 500;
+      }
+
+      .step-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      /* API List */
+      .api-list {
+        list-style: none;
+      }
+
+      .api-item {
+        background: white;
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--primary);
+        box-shadow: 0 2px 8px var(--shadow);
+        transition: var(--transition);
+      }
+
+      .api-item:hover {
+        transform: translateX(5px);
+      }
+
+      .api-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .api-method {
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        margin-right: 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .method-get {
+        background: rgba(64, 192, 87, 0.15);
+        color: #2b8a3e;
+      }
+
+      .method-post {
+        background: rgba(49, 108, 244, 0.15);
+        color: #1c7ed6;
+      }
+
+      .api-path {
+        font-family: monospace;
+        font-size: 1.1rem;
+      }
+
+      .api-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-size: 0.9rem;
+      }
+
+      /* Footer */
+      .app-footer {
+        text-align: center;
+        padding: 2rem 0;
+        margin-top: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 576px) {
+        .header-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 1.5rem;
+        }
+
+        .logo {
+          justify-content: center;
+        }
+
+        .card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <div class="logo-icon">K</div>
+            <div>
+              <div class="logo-text">应用系统文件管理系统</div>
+              <div class="tagline">文件的扫描、检查识别及加密保护</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="dashboard" style="grid-template-columns: 1fr">
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">📁</div>
+              <h2 class="card-title">知识库文件上传</h2>
+            </div>
+            <p>
+              提交结构化文件构建入库，系统将自动进行内容分割、向量化处理，并存入知识库。
+            </p>
+
+            <div class="upload-area">
+              <div class="upload-icon">📤</div>
+              <h3>拖放文件到此处</h3>
+              <p class="upload-info">
+                支持 PDF、DOCX、TXT 等格式文件（最大 100MB）
+              </p>
+              <button class="upload-btn" id="uploadBtn">选择文件</button>
+              <input
+                style="display: none"
+                type="file"
+                id="fileInput"
+                multiple
+                class="hidden"
+                accept="*/*"
+                onchange="handleFileSelection()"
+              />
+            </div>
+
+            <div>
+              <h3>已上传文件</h3>
+              <ul class="file-list">
+                <li class="file-item">
+                  <div class="file-icon">📄</div>
+                  <div class="file-info">
+                    <div class="file-name">系统架构文档.pdf</div>
+                    <div class="file-meta">上传于 2023-11-05 · 3.2MB</div>
+                  </div>
+                  <div class="file-status status-encrypted">已加密</div>
+                </li>
+                <li class="file-item">
+                  <div class="file-icon">📊</div>
+                  <div class="file-info">
+                    <div class="file-name">数据库设计.docx</div>
+                    <div class="file-meta">上传于 2023-11-04 · 1.8MB</div>
+                  </div>
+                  <div class="file-status status-processing">处理中</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">🔍</div>
+              <h2 class="card-title">模型识别服务</h2>
+            </div>
+            <p>上传文件并提问，系统将自动分析文件内容并回答您的问题。</p>
+
+            <div class="model-form" style="margin-top: 2rem">
+              <div class="form-group">
+                <label class="form-label">上传文件</label>
+                <div
+                  class="upload-area"
+                  style="padding: 1.5rem; margin-bottom: 1.5rem"
+                >
+                  <div class="upload-icon">📤</div>
+                  <p class="upload-info">拖放或点击上传文件</p>
+                  <button class="upload-btn" style="margin-top: 0">
+                    选择文件
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputText">提问内容</label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="inputText"
+                  placeholder="请帮我识别文件中的敏感信息并定位"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="knowledgeBase">选择知识库</label>
+                <select class="form-input" id="knowledgeBase">
+                  <option value="">-- 请选择知识库 --</option>
+                  <option value="system-architecture">系统架构文档.pdf</option>
+                  <option value="database-design">数据库设计.docx</option>
+                  <option value="new-upload">新上传文件.txt</option>
+                </select>
+              </div>
+
+              <div class="action-bar">
+                <button class="btn btn-outline">重置</button>
+                <button class="btn btn-primary" id="analyzeBtn">发送</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">分析结果</label>
+              <div
+                class="form-input"
+                style="
+                  min-height: 120px;
+                  background: var(--lighter);
+                  padding: 1rem;
+                "
+              >
+                <p id="analysisResult"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="container">
+      <div class="app-footer">
+        © 2023 应用系统文件管理系统 | 文件的扫描、检查识别及加密保护
+      </div>
+    </footer>
+
+    <script>
+      // 处理文件选择
+      function handleFileSelection() {
+        const fileInput = document.getElementById("fileInput");
+        const fileInfo = document.getElementById("fileInfo");
+
+        if (fileInput.files.length > 0) {
+          const fileNames = Array.from(fileInput.files).map(
+            (file) => file.name
+          );
+          fileInfo.textContent = `已选择 ${
+            fileInput.files.length
+          } 个文件: ${fileNames.join(", ")}`;
+        } else {
+          fileInfo.textContent = "";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        // 文件上传按钮事件
+        const uploadBtn = document.getElementById("uploadBtn");
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const analysisResult = document.getElementById("analysisResult");
+
+        uploadBtn.addEventListener("click", function () {
+          // 模拟文件上传过程
+          uploadBtn.innerHTML = '<span class="loader"></span> 上传中...';
+          uploadBtn.disabled = true;
+
+          setTimeout(function () {
+            uploadBtn.innerHTML = "✓ 上传成功";
+
+            // 添加一个文件到列表中
+            const fileList = document.querySelector(".file-list");
+            const newItem = document.createElement("li");
+            newItem.className = "file-item";
+            newItem.innerHTML = `
+                        <div class="file-icon">📑</div>
+                        <div class="file-info">
+                            <div class="file-name">新上传文件.txt</div>
+                            <div class="file-meta">上传于 ${new Date().toLocaleDateString()} · 560KB</div>
+                        </div>
+                        <div class="file-status status-processing">处理中</div>
+                    `;
+            fileList.insertBefore(newItem, fileList.firstChild);
+
+            // 模拟处理后状态变化
+            setTimeout(function () {
+              newItem.querySelector(".file-status").className =
+                "file-status status-encrypted";
+              newItem.querySelector(".file-status").textContent = "已加密";
+            }, 3000);
+          }, 1500);
+        });
+
+        // 文本分析按钮事件
+        analyzeBtn.addEventListener("click", function () {
+          const inputText = document.getElementById("inputText").value;
+
+          if (!inputText.trim()) {
+            analysisResult.innerHTML =
+              '<span style="color: var(--text-secondary);">请输入要分析的文本内容</span>';
+            return;
+          }
+
+          // 模拟分析过程
+          analysisResult.innerHTML =
+            '<div style="display: flex; justify-content: center; padding: 2rem;"><div class="loader"></div></div>';
+          analyzeBtn.disabled = true;
+          analyzeBtn.textContent = "分析中...";
+
+          setTimeout(function () {
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = "开始分析";
+
+            // 模拟分析结果
+            analysisResult.innerHTML = `
+                        <div style="margin-bottom: 1rem; color: var(--success); font-weight: 500;">✓ 分析完毕，敏感信息如下</div>
+                        <div style="margin-bottom: 0.5rem;"><strong>内容摘要:</strong> 文本讨论了系统文件的安全处理流程，包括上传、分析、向量化和存储。</div>
+                        <div style="margin-bottom: 0.5rem;"><strong>关键词提取:</strong> 系统文件、安全处理、向量化、加密</div>
+                        <div><strong>相似文档:</strong> 系统架构文档.pdf (相似度: 0.87)</div>
+                    `;
+          }, 2000);
+        });
+
+        // 添加一些动画效果
+        const cards = document.querySelectorAll(".card");
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = "0";
+            card.style.transform = "translateY(20px)";
+            card.style.transition = "all 0.6s ease-out";
+
+            setTimeout(() => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            }, 50);
+          }, index * 100);
+        });
+      });
+    </script>
+  </body>
+</html>
